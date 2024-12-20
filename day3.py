@@ -14,7 +14,7 @@ def parse(input: str) -> Iterator[tuple[int, int]]:
         yield (int(x), int(y))
 
 
-def strip_donts(input: str) -> str:
+def strip_donts(input: str) -> Iterator[str]:
     # Split on every don't() parse until next do (if exists)
     for part in input.split("don't()"):
         next_do = part.find("do()")

@@ -1,9 +1,10 @@
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 
 
-def read_input() -> str:
+def read_input() -> list[str]:
     return Path("inputs/day4.txt").read_text().strip().splitlines()
 
 
@@ -11,19 +12,19 @@ def diagonal_lines(grid: np.ndarray) -> list[list[str]]:
     cols, rows = grid.shape
     diagonals = []
     for i in range(-(cols), cols):
-        diagonals.append(grid.diagonal(i).tolist())
+        diagonals.append(cast(list[str], grid.diagonal(i).tolist()))
 
     flipped = np.fliplr(grid)
     for i in range(-(cols), cols):
-        diagonals.append(flipped.diagonal(i).tolist())
+        diagonals.append(cast(list[str], flipped.diagonal(i).tolist()))
 
     return diagonals
 
 
-def part1() -> None:
+def part1() -> int:
     grid = np.array([list(row) for row in read_input()])
-    rows = grid.tolist()
-    cols = grid.T.tolist()
+    rows = cast(list[list[str]], grid.tolist())
+    cols = cast(list[list[str]], grid.T.tolist())
     diagonals = diagonal_lines(grid)
     all = rows + cols + diagonals
     joined = ["".join(line) for line in all]
@@ -53,7 +54,7 @@ def find_a_points(grid: list[list[str]]) -> list[tuple[int, int]]:
     return points
 
 
-def part2() -> None:
+def part2() -> int:
     grid = [list(row) for row in read_input()]
     return sum([check_xmas(grid, point) for point in find_a_points(grid)])
 
