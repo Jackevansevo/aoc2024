@@ -37,7 +37,7 @@ def simulate(grid: Grid, pos: tuple[int, int], direction: str = "U") -> list[lis
             else:
                 x, y = x - 1, y
         elif direction == "R":
-            if y == dimension:
+            if y == dimension - 1:
                 return grid
             next_tile = grid[x][y + 1]
             if next_tile == "#":
@@ -45,7 +45,7 @@ def simulate(grid: Grid, pos: tuple[int, int], direction: str = "U") -> list[lis
             else:
                 x, y = x, y + 1
         elif direction == "D":
-            if x == dimension:
+            if x == dimension - 1:
                 return grid
             next_tile = grid[x + 1][y]
             if next_tile == "#":
@@ -72,6 +72,10 @@ def part1() -> int:
     start = find_starting_position(grid)
     end = simulate(grid, start)
     return count_walked(end)
+
+
+def part2() -> int:
+    return 10
 
 
 if __name__ == "__main__":
