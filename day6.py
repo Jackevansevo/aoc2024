@@ -1,5 +1,7 @@
 from pathlib import Path
 
+Grid = list[list[str]]
+
 
 def read_input() -> list[list[str]]:
     return [
@@ -8,12 +10,12 @@ def read_input() -> list[list[str]]:
     ]
 
 
-def pp_grid(grid: list[list[str]]) -> None:
+def pp_grid(grid: Grid) -> None:
     for line in grid:
         print("".join(line))
 
 
-def find_starting_position(grid: list[list[str]]) -> tuple[int, int]:
+def find_starting_position(grid: Grid) -> tuple[int, int]:
     for x, line in enumerate(grid):
         for y, char in enumerate(line):
             if char == "^":
@@ -21,9 +23,7 @@ def find_starting_position(grid: list[list[str]]) -> tuple[int, int]:
     raise ValueError("no starting pos found")
 
 
-def simulate(
-    grid: list[list[str]], pos: tuple[int, int], direction: str = "U"
-) -> list[list[str]]:
+def simulate(grid: Grid, pos: tuple[int, int], direction: str = "U") -> list[list[str]]:
     x, y = pos
     dimension = len(grid)
     while True:
@@ -62,7 +62,7 @@ def simulate(
                 x, y = x, y - 1
 
 
-def count_walked(grid: list[list[str]]) -> int:
+def count_walked(grid: Grid) -> int:
     flattened = [char for line in grid for char in line]
     return sum([char == "X" for char in flattened])
 
