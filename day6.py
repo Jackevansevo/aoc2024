@@ -1,3 +1,4 @@
+from collections import namedtuple
 from pathlib import Path
 
 Grid = list[list[str]]
@@ -10,73 +11,86 @@ def read_input() -> list[list[str]]:
     ]
 
 
-def pp_grid(grid: Grid) -> None:
-    for line in grid:
-        print("".join(line))
+Point = namedtuple("Point", ["x", "y"])
 
 
-def find_starting_position(grid: Grid) -> tuple[int, int]:
+def find_starting_position(grid: Grid) -> Point:
     for x, line in enumerate(grid):
         for y, char in enumerate(line):
             if char == "^":
-                return x, y
+                return Point(x, y)
     raise ValueError("no starting pos found")
 
 
-def simulate(grid: Grid, pos: tuple[int, int], direction: str = "U") -> list[list[str]]:
-    x, y = pos
+def walked_paths(grid: Grid, pos: Point) -> set[Point]:
+    grid[pos.x][pos.y] = "."
+
+    dir = 0
+    dirs = (Point(-1, 0), Point(0, 1), Point(1, 0), Point(0, -1))
     dimension = len(grid)
+    walked = set()
+
     while True:
-        grid[x][y] = "X"
-        if direction == "U":
-            if x == 0:
-                return grid
-            next_tile = grid[x - 1][y]
-            if next_tile == "#":
-                direction = "R"
-            else:
-                x, y = x - 1, y
-        elif direction == "R":
-            if y == dimension - 1:
-                return grid
-            next_tile = grid[x][y + 1]
-            if next_tile == "#":
-                direction = "D"
-            else:
-                x, y = x, y + 1
-        elif direction == "D":
-            if x == dimension - 1:
-                return grid
-            next_tile = grid[x + 1][y]
-            if next_tile == "#":
-                direction = "L"
-            else:
-                x, y = x + 1, y
-        elif direction == "L":
-            if y == 0:
-                return grid
-            next_tile = grid[x][y - 1]
-            if next_tile == "#":
-                direction = "U"
-            else:
-                x, y = x, y - 1
+        x = pos.x + dirs[dir].x
+        y = pos.y + dirs[dir].y
+        if (x < 0 or x >= dimension) or (y < 0 or y >= dimension):
+            break
+        if grid[x][y] == ".":
+            pos = Point(x, y)
+            walked.add(pos)
+        else:
+            dir = (dir + 1) % 4
+    return walked
 
 
-def count_walked(grid: Grid) -> int:
-    flattened = [char for line in grid for char in line]
-    return sum([char == "X" for char in flattened])
+def count_cycles(grid: Grid, pos: Point) -> int:
+    dirs = (Point(-1, 0), Point(0, 1), Point(1, 0), Point(0, -1))
+    dimension = len(grid)
+
+    def detect_cycle(grid: Grid, pos: Point) -> bool:
+        dir = 0
+        visited: set[tuple[Point, int]] = set()
+        while True:
+            x = pos.x + dirs[dir].x
+            y = pos.y + dirs[dir].y
+            if (x < 0 or x >= dimension) or (y < 0 or y >= dimension):
+                return False
+            if grid[x][y] == ".":
+                pos = Point(x, y)
+                if (pos, dir) in visited:
+                    return True
+                visited.add((pos, dir))
+            else:
+                dir = (dir + 1) % 4
+
+    # Consider all walked paths
+    cycles = 0
+    for point in walked_paths(grid, pos):
+        if point == pos:
+            continue
+        if grid[point.x][point.y] == ".":
+            # Does placing a O cause a cycle
+            grid[point.x][point.y] = "O"
+            if detect_cycle(grid, pos):
+                cycles += 1
+            # Reset back to dot
+            grid[point.x][point.y] = "."
+
+    return cycles
 
 
 def part1() -> int:
     grid = read_input()
     start = find_starting_position(grid)
-    end = simulate(grid, start)
-    return count_walked(end)
+    return len(walked_paths(grid, start))
 
 
 def part2() -> int:
-    return 10
+    grid = read_input()
+    start = find_starting_position(grid)
+    return count_cycles(grid, start)
 
 
 if __name__ == "__main__":
-    print(part1())
+    # print(part1())
+    print(part2())
