@@ -18,9 +18,12 @@ def find_starting_position(grid: list[list[str]]) -> tuple[int, int]:
         for y, char in enumerate(line):
             if char == "^":
                 return x, y
+    raise ValueError("no starting pos found")
 
 
-def simulate(grid: list[list[str]], pos: tuple[int, int], direction: str = "U") -> None:
+def simulate(
+    grid: list[list[str]], pos: tuple[int, int], direction: str = "U"
+) -> list[list[str]]:
     x, y = pos
     dimension = len(grid)
     while True:
@@ -64,7 +67,7 @@ def count_walked(grid: list[list[str]]) -> int:
     return sum([char == "X" for char in flattened])
 
 
-def part1() -> None:
+def part1() -> int:
     grid = read_input()
     start = find_starting_position(grid)
     end = simulate(grid, start)
