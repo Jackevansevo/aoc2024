@@ -1,3 +1,4 @@
+from collections import deque
 from itertools import zip_longest
 from pathlib import Path
 from typing import cast
@@ -21,53 +22,26 @@ def disk_map(parsed: list[int]) -> list[int | str]:
     return disk_map
 
 
-def has_free_space(disk_map: list[int | str]) -> bool:
-    """
-    Returns True if any disk block encountered after free space
-    """
-    free_space = False
-    for char in disk_map:
-        if char == ".":
-            free_space = True
-        else:
-            if free_space:
-                return True
-    return False
-
-
 def move_blocks(disk_map: list[int | str]) -> list[int | str]:
-    limit = len(disk_map)
-    end_block_index = 1
-    free_space_index = 0
+    free_index: deque[int] = deque()
+    block_index: deque[int] = deque()
+
+    for index, block in enumerate(disk_map):
+        if block == ".":
+            free_index.append(index)
+        else:
+            block_index.append(index)
 
     while True:
-        # We can probably optimise this to only check from a starting point
-        if not has_free_space(disk_map):
+        free_block = block_index.pop()
+        free_space = free_index.popleft()
+
+        if free_space > free_block:
             return disk_map
 
-        disk_map[::-1]
-
-        def find_end_block(start: int) -> int:
-            for index in range(abs(start), limit):
-                if disk_map[-index] == ".":
-                    continue
-                return -index
-            raise Exception("Impossible state")
-
-        def leftmost_free_space(start: int) -> int:
-            for index in range(start, limit):
-                if disk_map[index] == ".":
-                    return index
-                continue
-            raise Exception("Impossible state")
-
-        end_block_index = find_end_block(start=end_block_index)
-        free_space_index = leftmost_free_space(start=free_space_index)
-
-        # Swap
-        disk_map[end_block_index], disk_map[free_space_index] = (
-            disk_map[free_space_index],
-            disk_map[end_block_index],
+        disk_map[free_block], disk_map[free_space] = (
+            disk_map[free_space],
+            disk_map[free_block],
         )
 
 
