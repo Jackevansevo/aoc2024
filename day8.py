@@ -41,7 +41,6 @@ def part1() -> int:
                 continue
 
             point = Point(x, y)
-            # TODO:part2 keep going in this same direction until we leave the grid
             for neighbor in find_neighbors(grid, point, val):
                 diff_x, diff_y = point.x - neighbor.x, point.y - neighbor.y
                 anti_node = Point(point.x + diff_x, point.y + diff_y)
@@ -54,5 +53,36 @@ def part1() -> int:
     return len(anti_nodes)
 
 
+def part2() -> int:
+    grid = read_input()
+
+    anti_nodes = set()
+    dimension = len(grid)
+
+    for x, _ in enumerate(grid):
+        for y, _ in enumerate(grid):
+            val = grid[x][y]
+            if val == ".":
+                continue
+
+            point = Point(x, y)
+            anti_nodes.add(point)
+
+            for neighbor in find_neighbors(grid, point, val):
+                diff_x, diff_y = point.x - neighbor.x, point.y - neighbor.y
+                anti_node = point
+                while True:
+                    anti_node = Point(anti_node.x + diff_x, anti_node.y + diff_y)
+                    if (anti_node.x >= 0 and anti_node.x < dimension) and (
+                        anti_node.y >= 0 and anti_node.y < dimension
+                    ):
+                        anti_nodes.add(anti_node)
+                    else:
+                        break
+
+    return len(anti_nodes)
+
+
 if __name__ == "__main__":
-    print(part1())
+    # print(part1())
+    print(part2())
