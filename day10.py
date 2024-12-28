@@ -41,16 +41,14 @@ def get_neighbors(point: Point, grid: Grid) -> list[Point]:
     ]
 
 
-def possible_paths(point: Point, grid: Grid) -> list[Point]:
+def possible_paths(point: Point, grid: Grid) -> Iterator[Point]:
     height = int(grid[point.x][point.y])
-    next_paths = []
     for n in get_neighbors(point, grid):
         # Bounds check
         if n.x >= 0 and n.y >= 0 and n.x < len(grid) and n.y < len(grid):
             # Height check
             if grid[n.x][n.y] == height + 1:
-                next_paths.append(n)
-    return next_paths
+                yield n
 
 
 def traverse(tree: Tree, grid: Grid) -> Tree:
