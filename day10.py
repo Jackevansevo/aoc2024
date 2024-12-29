@@ -56,21 +56,28 @@ def traverse(tree: Tree, grid: Grid) -> Tree:
     return Tree(node=tree.node, children=children)
 
 
-def part1() -> int:
+def travel() -> Iterator[list[Point]]:
     grid = read_input()
+
     trailheads = []
     for x, line in enumerate(grid):
         for y, num in enumerate(line):
             if num == 0:
                 trailheads.append(Point(x, y))
 
-    scores = []
     for point in trailheads:
         tree = traverse(Tree(point), grid)
-        scores.append(len(set([n for n in tree.leaf_nodes if grid[n.x][n.y] == 9])))
+        yield [n for n in tree.leaf_nodes if grid[n.x][n.y] == 9]
 
-    return sum(scores)
+
+def part1() -> int:
+    return sum(map(lambda nodes: len(set(nodes)), travel()))
+
+
+def part2() -> int:
+    return sum(map(len, travel()))
 
 
 if __name__ == "__main__":
     print(part1())
+    print(part2())
